@@ -21,40 +21,65 @@ st.set_page_config(page_title="PFC Tracker", layout="centered", initial_sidebar_
 st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
 <style>
+    /* 1. 読み込み中表示を非表示にする */
     [data-testid="stStatusWidget"] { visibility: hidden; }
-            
-    /* 読み込み用スピナーのカスタマイズ */
+    
+    /* 2. 読み込み用スピナー（全画面オーバーレイ） */
     div[data-testid="stSpinner"] > div {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background-color: rgba(0, 0, 0, 0.5); z-index: 9999;
         display: flex; align-items: center; justify-content: center; color: white;
     }
             
-    /* 【新規】中央ポップアップ（褒め言葉用） */
-    .praise-overlay {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background-color: rgba(0, 0, 0, 0.7); z-index: 10000;
-        display: flex; align-items: center; justify-content: center;
-        flex-direction: column;
-    }
-    .praise-card {
-        background: white; padding: 40px; border-radius: 25px;
-        color: #5D4037; text-align: center; border: 4px solid #E6CFCF;
-        max-width: 80%; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-            
+    /* 3. 全体背景とフォントの設定 */
     html, body, [data-testid="stAppViewContainer"] {
         font-family: 'Quicksand', 'Noto Sans JP', sans-serif;
         background-color: #FDFCF5; font-size: 0.9rem;
     }
-    [data-testid="stHorizontalBlock"] { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; gap: 8px !important; }
-    [data-testid="column"] { flex: 1 1 0% !important; min-width: 0px !important; }
-    div[data-testid="metric-container"] { background-color: #FFFFFF; border: 1px solid #F3E5DC; padding: 12px; border-radius: 15px; }
+            
+    /* 4. 【修正点】横並びブロックの折り返しを許可 */
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important; /* nowrapからwrapに変更 */
+        gap: 8px !important;
+    }
+            
+    /* 5. 【修正点】各カラム（ボタンなど）の最小幅を設定 */
+    [data-testid="column"] {
+        flex: 1 1 0% !important;
+        min-width: 140px !important; /* 狭くなるとこの幅を維持して折り返す */
+    }
+            
+    /* 6. PFCメトリクスのデザイン */
+    div[data-testid="metric-container"] {
+        background-color: #FFFFFF; border: 1px solid #F3E5DC;
+        padding: 12px; border-radius: 15px;
+    }
     div[data-testid="stMetricValue"] { font-size: 1.1rem !important; font-weight: 700 !important; }
-    .stTextArea textarea { border: 2px solid #E6CFCF !important; background-color: #FFFFFF !important; border-radius: 15px !important; font-size: 1.0rem !important; }
+            
+    /* 7. テキストエリアのデザイン */
+    .stTextArea textarea {
+        border: 2px solid #E6CFCF !important;
+        background-color: #FFFFFF !important;
+        border-radius: 15px !important;
+        font-size: 1.0rem !important;
+    }
+            
+    /* 8. ボタンのデザイン */
     .stButton>button { border-radius: 12px !important; font-weight: 700; }
-    form[data-testid="stForm"], div[data-testid="stVerticalBlockBorderWrapper"] { background-color: #FFFFFF; border: 1px solid #F3E5DC; border-radius: 15px; padding: 15px; }
-    .dot-container { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; background: white; border-radius: 12px; border: 1px solid #F3E5DC; }
+            
+    /* 9. フォームや外枠のデザイン */
+    form[data-testid="stForm"], div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #FFFFFF; border: 1px solid #F3E5DC;
+        border-radius: 15px; padding: 15px;
+    }
+            
+    /* 10. カレンダーのドット表示 */
+    .dot-container {
+        display: flex; flex-wrap: wrap; gap: 4px; padding: 10px;
+        background: white; border-radius: 12px; border: 1px solid #F3E5DC;
+    }
     .dot { width: 12px; height: 12px; border-radius: 2px; }
     .dot-none { background-color: #EBEDF0; }
     .dot-logged { background-color: #E6CFCF; }
